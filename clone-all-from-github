@@ -1,54 +1,18 @@
 #!/usr/bin/env bash
 
-VERSION="0.1.0"
 SCRIPT_NAME="$(basename "$(realpath "$0")")"
-
-echo "* Running version v$VERSION"
 
 # {{{ argumnent variable definitions
 
-DEFAULT_JOBS=5
+DEFAULT_JOBS=8
 DEFAULT_LIMIT=25
-DEFAULT_DIR="$PWD"
+DEFAULT_DIR="$(pwd)"
 
 DIR=""
 DEPTH=0
 JOBS=-1
 LIMIT=-1
 OWNER=""
-
-# }}}
-# {{{ environment validation
-
-GH_PATH="$(which gh)"
-JQ_PATH="$(which jq)"
-
-if [[ -z "$GH_PATH" ]]; then
-	echo "ERR The GitHub CLI (gh) is required by was not found in the PATH."
-	echo "ERR Install it and try again."
-	echo ""
-	echo "- For instructions, visit: https://cli.github.com"
-	exit 1
-
-  # TODO: Recommend actual install commands based on distro
-fi
-
-if [[ -z "$JQ_PATH" ]]; then
-	echo "ERR The JQ utility was not found in the PATH."
-	echo "ERR Install it and try again."
-	echo ""
-	echo "- For instructions, visit: https://stedolan.github.io/jq/download/"
-	exit 1
-
-  # TODO: Recommend actual install commands based on distro
-fi
-
-if [[ $# -eq 0 ]]; then
-	echo "ERR Required argument '--owner' not provided."
-  echo ""
-  echo "- Consult the help output (via --help) and follow the instructions."
-	exit 1
-fi
 
 # }}}
 # {{{ functions
@@ -85,7 +49,7 @@ echo_flags() {
 	echo "  --help: Show this help text"
 	echo ""
 	echo "  --depth: The depth at which to clone the remote repository. Defaults"
-	echo"            to -1, which is the full history. Any other value will limit"
+	echo "           to -1, which is the full history. Any other value will limit"
 	echo "           the clone to the specified number of commits."
 	echo ""
 	echo "  --dir:   Sets the directory where the repositories will be cloned."
@@ -152,6 +116,34 @@ echo_help() {
 }
 
 # }}}
+# {{{ environment validation
+
+FOUND_ERRORS=0
+
+GH_PATH="$(which gh)"
+JQ_PATH="$(which jq)"
+
+if [[ -z "$GH_PATH" ]]; then
+	echo "Error: The GitHub CLI (gh) is required but was not found."
+
+  FOUND_ERRORS=1
+fi
+
+# TODO: Recommend actual install commands based on distro
+if [[ -z "$JQ_PATH" ]]; then
+	echo "Error: The JQ utility is required but was not found."
+
+  FOUND_ERRORS=1
+fi
+
+if [[ $FOUND_ERRORS -eq 1 ]]; then
+  echo ""
+  echo "See --help for usage instructions."
+
+  exit 1
+fi
+
+# }}}
 # {{{ parse arguments
 
 for ((i = 1; i <= $#; i++)); do
@@ -184,83 +176,85 @@ for ((i = 1; i <= $#; i++)); do
 done
 
 # }}}
-# {{{ use default values for omitted optional argumnets
+# {{{ set default values
 
-if [[ "$JOBS" -eq -1 ]]; then
-	JOBS=$DEFAULT_JOBS
-	echo "! Job count not specified, using default value $DEFAULT_JOBS"
+if [[ $JOBS -eq -1 ]]; then
+  JOBS=$DEFAULT_JOBS
 fi
 
-if [[ "$LIMIT" -eq -1 ]]; then
-	LIMIT=$DEFAULT_LIMIT
-	echo "! Max repo limit not specified, using default value $DEFAULT_LIMIT"
+if [[ $LIMIT -eq -1 ]]; then
+  LIMIT=$DEFAULT_LIMIT
 fi
 
 if [[ -z "$DIR" ]]; then
-	DIR=$DEFAULT_DIR
-	echo "! Output directory not specified, using default value $DEFAULT_DIR"
+  DIR="$DEFAULT_DIR"
 fi
 
 # }}}
 # {{{ validate final argument values
 
-echo ""
+FOUND_ERRORS=0
 
-if [[ -n "$LIMIT" ]] && [[ "$LIMIT" -lt 0 ]]; then
-	echo "Error: Limit must be a positive number"
-	exit 1
-else
-  echo "* Will clone at most $LIMIT repositories."
+if [[ "$LIMIT" -lt 1 ]]; then
+  echo "Error: --limit must be greater than 1"
+
+  FOUND_ERRORS=1
 fi
 
-if [[ -n "$JOBS" ]] && [[ "$JOBS" -lt 0 ]]; then
-	echo "Error: Number of jobs must be at least 1"
-	exit 1
-else
-  echo "* Will clone $JOBS repositories at a time, in paralllel."
+if [[ "$JOBS" -lt 1 ]]; then
+	echo "Error: --jobs must be at least 1"
+
+  FOUND_ERRORS=1
 fi
 
-if [[ -n "$DEPTH" ]] && [[ "$DEPTH" -lt 0 ]]; then
-	echo "Error: Clone commit depth must be at least 1 if provided."
-	exit 1
-else
-  if [[ -z "$DEPTH" ]]; then
-    echo "* Will clone complete commit histories."
-  else
-    echo "* Will clone only the last $DEPTH commits."
-  fi
+if [[ "$DEPTH" -lt 0 ]]; then
+	echo "Error: --depth must be at least 0 if provided"
+
+  FOUND_ERRORS=1
 fi
 
 if [[ -z "$OWNER" ]]; then
-	echo "Error: Owner not specified"
-	exit 1
-else
-  echo "* Target repository author is $OWNER."
+	echo "Error: --owner not specified"
+
+  FOUND_ERRORS=1
 fi
 
 if [[ ! -d "$DIR" ]]; then
 	echo "Error: Output directory $DIR does not exist."
-  exit 1
-else
-  echo "* Cloning into directory $DIR..."
+
+  FOUND_ERRORS=1
 fi
 
-echo ""
+if [[ $FOUND_ERRORS -eq 1 ]]; then
+  echo ""
+  echo "See --help for usage instructions."
+
+  exit 1
+fi
 
 # }}}
 
-echo "* Fetching a list of at most $LIMIT repositories belonging to $OWNER..."
+echo "* Output directory: $DIR"
+echo "* Cloning at most $LIMIT repositories."
+echo "* Will clone $JOBS repositories concurrently."
 
-GH_REPOS_LIST_JSON=$(gh repo list "$OWNER" --json name --limit "$LIMIT")
+if [[ $DEPTH -eq 0 ]]; then
+  echo "* Will clone full commit histories."
+else
+  echo "* Will clone only the last $DEPTH commits."
+fi
+
+echo ""
+echo "* Fetching repositories for $OWNER..."
+
+GH_REPOS_LIST_JSON="$(gh repo list "$OWNER" --json name --limit "$LIMIT")"
 mapfile -t GH_REPOS_LIST < <(echo "$GH_REPOS_LIST_JSON" | jq -r '.[].name')
-GH_REPOS_LIST_COUNT=${#GH_REPOS_LIST[@]}
+GH_REPOS_LIST_COUNT="${#GH_REPOS_LIST[@]}"
 
-if [[ -z $GH_REPOS_LIST_COUNT ]]; then
+if [[ -z "$GH_REPOS_LIST_COUNT" ]]; then
   echo "Error: Found no repositories for $OWNER."
   exit 1
 fi
-
-echo "* Found $GH_REPOS_LIST_COUNT repositories."
 
 NEW_GH_REPOS_LIST=()
 SKIP_COUNT=0
@@ -275,48 +269,48 @@ for GH_REPO in "${GH_REPOS_LIST[@]}"; do
 
     ((SKIP_COUNT++))
 
-    echo "- [$SKIP_COUNT] skipped existing repository $GH_REPO."
+    echo "- Found existing repository $GH_REPO."
 	fi
 done
-
-if [[ $SKIP_COUNT -gt 0 ]]; then
-  echo ""
-fi
 
 EXISTING_REPO_COUNT=$((${#GH_REPOS_LIST[@]} - ${#NEW_GH_REPOS_LIST[@]}))
 NEW_REPO_COUNT=${#NEW_GH_REPOS_LIST[@]}
 
 if [[ $NEW_REPO_COUNT -eq 0 ]]; then
-  echo "! All repositories already present in $DIR, nothing to do."
+  echo ""
+  echo "* All repositories already present in $DIR, nothing to do."
   exit 0
 fi
 
-echo "- $NEW_REPO_COUNT new repositories will be cloned in $DIR/"
-echo "- $EXISTING_REPO_COUNT existing repositories will be skipped."
+echo ""
+echo "* Found $GH_REPOS_LIST_COUNT repositories."
+echo "* $NEW_REPO_COUNT new repositories will be cloned in $DIR/"
+echo "* $EXISTING_REPO_COUNT existing repositories will be skipped."
 echo ""
 
-CLONE_COUNT=$SKIP_COUNT
+REPOS=("${NEW_GH_REPOS_LIST[@]}")
 
-for REPO in "${NEW_GH_REPOS_LIST[@]}"
-do
-  ((CLONE_COUNT++))
+export ARG_OWNER=$OWNER
+export ARG_DIR=$DIR
+export ARG_DEPTH=$DEPTH
 
-  if [[ $DEPTH -gt 0 ]]; then
-    echo "C [$CLONE_COUNT] cloning $OWNER/$REPO (most recent $DEPTH commits)..."
+clone_repos() {
+  REPO="$1"
+  CWD="$(pwd)"
 
-    CWD=$(pwd)
-    cd "$DIR" || exit 1
-    gh repo clone "$OWNER"/"$REPO" -- --depth="$DEPTH" > /dev/null 2>&1
-    cd "$CWD" || exit 1
+  echo "- Cloning $ARG_OWNER/$REPO..."
+
+  cd "$ARG_DIR" || exit 1
+
+  if [[ "$ARG_DEPTH" -gt 0 ]]; then
+   git clone --depth "$ARG_DEPTH" --mirror git@github.com:"$ARG_OWNER"/"$REPO" > /dev/null 2>&1
   else
-    echo "C [$CLONE_COUNT] cloning $OWNER/$REPO (all commits)..."
-
-    CWD=$(pwd)
-    cd "$DIR" || exit 1
-    gh repo clone "$OWNER"/"$REPO" > /dev/null 2>&1
-    cd "$CWD" || exit 1
+   git clone --mirror git@github.com:"$ARG_OWNER"/"$REPO" > /dev/null 2>&1
   fi
-done
 
-echo ""
-echo "* All '$OWNER' accont repositories have been cloned into $DIR."
+  cd "$CWD" || exit 1
+}
+
+export -f clone_repos
+
+parallel -j $JOBS clone_repos ::: "${REPOS[@]}"
