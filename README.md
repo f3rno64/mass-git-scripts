@@ -29,12 +29,21 @@ sudo apt install jq parallel gh
 
 ## Installation
 
-To use, clone this repository somewhere and add it to your path. For example:
+To use, clone this repository, and run `sudo make install` to install the
+scripts in `/usr/local/bin`.
+
+Then, for example, if you have your personal repos in `~/.src/github/username`,
+and want to update all of them, you can run:
 
 ```bash
-git clone https://github.com/f3rno64/mass-git-scripts.git ~/.bin/mass-git-scripts
+git-pull-all ~/.src/github/username
+```
 
-echo 'export PATH="$PATH:$HOME/.bin/mass-git-scripts"' >> ~/.bashrc
+If you have reset your environment and want to clone all of your repos, you can
+run:
+
+```bash
+git-clone-all --owner user --dir ~/.src/github/user --limit 1000 --jobs 20
 ```
 
 ## Usage

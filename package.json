@@ -1,0 +1,14 @@
+{
+  "name": "mass-git-scripts",
+  "version": "1.0.0",
+  "description": "Scripts for managing many git repositories with ease.",
+  "keywords": [
+    "git",
+    "scripts"
+  ],
+  "author": "Cris Mihalache <f3rno64@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "remark": "^15.0.1"
+  }
+}
