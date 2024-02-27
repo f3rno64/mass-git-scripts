@@ -1,0 +1,162 @@
+#! /usr/bin/env bash
+
+export C_RED='\033[0;31m'
+export C_BLUE='\033[0;34m'
+export C_CYAN='\033[0;36m'
+export C_BLACK='\033[0;30m'
+export C_GREEN='\033[0;32m'
+export C_WHITE='\033[0;37m'
+export C_PURPLE='\033[0;35m'
+export C_YELLOW='\033[0;33m'
+export C_DARK_GRAY='\033[0;30m'
+export C_LIGHT_RED='\033[0;31m'
+export C_LIGHT_GRAY='\033[0;37m'
+export C_LIGHT_BLUE='\033[0;34m'
+export C_LIGHT_CYAN='\033[0;36m'
+export C_LIGHT_GREEN='\033[0;32m'
+export C_BROWN_ORANGE='\033[0;33m'
+export C_LIGHT_PURPLE='\033[0;35m'
+
+export C_RED_BOLD='\033[1;31m'
+export C_BLUE_BOLD='\033[1;34m'
+export C_CYAN_BOLD='\033[1;36m'
+export C_BLACK_BOLD='\033[1;30m'
+export C_GREEN_BOLD='\033[1;32m'
+export C_WHITE_BOLD='\033[1;37m'
+export C_PURPLE_BOLD='\033[1;35m'
+export C_YELLOE_BOLD='\033[1;33m'
+export C_DARK_GRAE_BOLD='\033[1;30m'
+export C_LIGHT_REE_BOLD='\033[1;31m'
+export C_LIGHT_GRAY_BOLD='\033[1;37m'
+export C_LIGHT_BLUE_BOLD='\033[1;34m'
+export C_LIGHT_CYAE_BOLD='\033[1;36m'
+export C_LIGHT_GREEE_BOLD='\033[1;32m'
+export C_BROWN_ORANGE_BOLD='\033[1;33m'
+export C_LIGHT_PURPLE_BOLD='\033[1;35m'
+
+export C_RED_UNDERLINED='\033[4;31m'
+export C_BLUE_UNDERLINED='\033[4;34m'
+export C_CYAN_UNDERLINED='\033[4;36m'
+export C_BLACK_UNDERLINED='\033[4;30m'
+export C_GREEN_UNDERLINED='\033[4;32m'
+export C_WHITE_UNDERLINED='\033[4;37m'
+export C_PURPLE_UNDERLINED='\033[4;35m'
+export C_YELLOW_UNDERLINED='\033[4;33m'
+export C_DARK_GRAY_UNDERLINED='\033[4;30m'
+export C_LIGHT_RED_UNDERLINED='\033[4;31m'
+export C_LIGHT_GRAY_UNDERLINED='\033[4;37m'
+export C_LIGHT_BLUE_UNDERLINED='\033[4;34m'
+export C_LIGHT_CYAN_UNDERLINED='\033[4;36m'
+export C_LIGHT_GREEN_UNDERLINED='\033[4;32m'
+export C_BROWN_ORANGE_UNDERLINED='\033[4;33m'
+export C_LIGHT_PURPLE_UNDERLINED='\033[4;35m'
+
+export C_RED_BLINKING='\033[5;31m'
+export C_BLUE_BLINKING='\033[5;34m'
+export C_CYAN_BLINKING='\033[5;36m'
+export C_BLACK_BLINKING='\033[5;30m'
+export C_GREEN_BLINKING='\033[5;32m'
+export C_WHITE_BLINKING='\033[5;37m'
+export C_PURPLE_BLINKING='\033[5;35m'
+export C_YELLOW_BLINKING='\033[5;33m'
+export C_DARK_GRAY_BLINKING='\033[5;30m'
+export C_LIGHT_RED_BLINKING='\033[5;31m'
+export C_LIGHT_GRAY_BLINKING='\033[5;37m'
+export C_LIGHT_BLUE_BLINKING='\033[5;34m'
+export C_LIGHT_CYAN_BLINKING='\033[5;36m'
+export C_LIGHT_GREEN_BLINKING='\033[5;32m'
+export C_BROWN_ORANGE_BLINKING='\033[5;33m'
+export C_LIGHT_PURPLE_BLINKING='\033[5;35m'
+
+export C_ARG="$C_BLUE"
+export C_ERROR="$C_RED"
+export C_TEXT="$C_WHITE"
+export C_DIR="$C_PURPLE"
+export C_NUMBER="$C_GREEN"
+export C_REPO="$C_LIGHT_PURPLE"
+export C_TEXT_HIGHLIGHT="$C_YELLOW"
+
+export NC='\033[0m'
+
+unset_colors() {
+  unset C_RED
+  unset C_BLUE
+  unset C_CYAN
+  unset C_BLACK
+  unset C_GREEN
+  unset C_WHITE
+  unset C_PURPLE
+  unset C_YELLOW
+  unset C_DARK_GRAY
+  unset C_LIGHT_RED
+  unset C_LIGHT_GRAY
+  unset C_LIGHT_BLUE
+  unset C_LIGHT_CYAN
+  unset C_LIGHT_GREEN
+  unset C_BROWN_ORANGE
+  unset C_LIGHT_PURPLE
+
+  unset C_RED_BOLD
+  unset C_BLUE_BOLD
+  unset C_CYAN_BOLD
+  unset C_BLACK_BOLD
+  unset C_GREEN_BOLD
+  unset C_WHITE_BOLD
+  unset C_PURPLE_BOLD
+  unset C_YELLOE_BOLD
+  unset C_DARK_GRAE_BOLD
+  unset C_LIGHT_REE_BOLD
+  unset C_LIGHT_GRAY_BOLD
+  unset C_LIGHT_BLUE_BOLD
+  unset C_LIGHT_CYAE_BOLD
+  unset C_LIGHT_GREEE_BOLD
+  unset C_BROWN_ORANGE_BOLD
+  unset C_LIGHT_PURPLE_BOLD
+
+  unset C_RED_UNDERLINED
+  unset C_BLUE_UNDERLINED
+  unset C_CYAN_UNDERLINED
+  unset C_BLACK_UNDERLINED
+  unset C_GREEN_UNDERLINED
+  unset C_WHITE_UNDERLINED
+  unset C_PURPLE_UNDERLINED
+  unset C_YELLOW_UNDERLINED
+  unset C_DARK_GRAY_UNDERLINED
+  unset C_LIGHT_RED_UNDERLINED
+  unset C_LIGHT_GRAY_UNDERLINED
+  unset C_LIGHT_BLUE_UNDERLINED
+  unset C_LIGHT_CYAN_UNDERLINED
+  unset C_LIGHT_GREEN_UNDERLINED
+  unset C_BROWN_ORANGE_UNDERLINED
+  unset C_LIGHT_PURPLE_UNDERLINED
+
+  unset C_RED_BLINKING
+  unset C_BLUE_BLINKING
+  unset C_CYAN_BLINKING
+  unset C_BLACK_BLINKING
+  unset C_GREEN_BLINKING
+  unset C_WHITE_BLINKING
+  unset C_PURPLE_BLINKING
+  unset C_YELLOW_BLINKING
+  unset C_DARK_GRAY_BLINKING
+  unset C_LIGHT_RED_BLINKING
+  unset C_LIGHT_GRAY_BLINKING
+  unset C_LIGHT_BLUE_BLINKING
+  unset C_LIGHT_CYAN_BLINKING
+  unset C_LIGHT_GREEN_BLINKING
+  unset C_BROWN_ORANGE_BLINKING
+  unset C_LIGHT_PURPLE_BLINKING
+
+  unset C_ARG
+  unset C_ERROR
+  unset C_TEXT
+  unset C_DIR
+  unset C_NUMBER
+  unset C_REPO
+  unset C_TEXT_HIGHLIGHT
+
+  unset NC
+  unset unset_colors
+}
+
+export -f unset_colors

@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+
+# TODO: Add --jobs argument to set parallel call concurrency
+
+SCRIPT_PATH="$(realpath "$0")"
+SCRIPT_DIR="$(dirname "$SCRIPT_PATH")"
+
+source "$SCRIPT_DIR/lib/colors.sh"
+
+N_REPOS_UPDATED=0
+N_REPOS_SKIPPED=0
+
+INITIAL_PATH="$(pwd)"
+INPUT_DIR="$*"
+
+if [[ -z "$INPUT_DIR" ]]; then
+  REPO_DIR="$(pwd)"
+else
+  REPO_DIR="$INPUT_DIR"
+fi
+
+if [[ ! -d "$REPO_DIR" ]]; then
+  echo -e "${C_ERROR}Errror:${NC} ${C_DIR}$REPO_DIR${NC} ${C_ERROR}is not a directory${NC}"
+  exit 1
+fi
+
+cd "$REPO_DIR" || exit 1
+
+GIT_REPO_COUNT="$(find "$REPO_DIR" -maxdepth 1 -type d -exec test -e '{}/.git' ';' -print | wc -l)"
+REPOS=()
+
+for DIR in ./*; do
+  if [[ -d "$DIR/.git" ]]; then
+    REPOS+=("$DIR")
+  fi
+done
+
+if [[ ${#REPOS[@]} -eq 0 ]]; then
+  echo -e "${C_TEXT}No git repositories found in${NC} ${C_DIR}$REPO_DIR${NC}"
+  cd "$INITIAL_PATH" || exit
+  exit
+else
+  echo -e "${C_TEXT}Found${NC} ${C_NUMBER}$GIT_REPO_COUNT${NC} ${C_TEXT}git repositories in${NC} ${C_DIR}$REPO_DIR${NC} ${C_TEXT}to update...${NC}"
+  echo ""
+fi
+
+export ARG_DIR=$DIR
+export N_REPOS_UPDATED
+export N_REPOS_SKIPPED
+
+update_repo() {
+  REPO="$1"
+
+	if [[ ! -d "$ARG_DIR/.git" ]]; then
+		return
+	fi
+
+  cd "$ARG_DIR" || exit 1
+
+	ACTIVE_REMOTE="$(git rev-parse --abbrev-ref --symbolic-full-name @\{u\} | cut -d'/' -f1)"
+	ACTIVE_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+
+	if [[ -n "$(git status --porcelain)" ]]; then
+    export N_REPOS_SKIPPED="$((N_REPOS_SKIPPED + 1)))"
+
+		echo -e "${C_TEXT}-${NC} ${C_REPO}$REPO${NC} ${C_TEXT}has uncommitted changes, skipping...${NC}"
+    cd ..
+    return
+	fi
+
+  HASH_BEFORE="$(git rev-parse HEAD)"
+
+  git pull --tags "$ACTIVE_REMOTE" "$ACTIVE_BRANCH" > /dev/null 2>&1
+
+  HASH_AFTER="$(git rev-parse HEAD)"
+  N_COMMITS="$(git rev-list --count "$HASH_BEFORE".."$HASH_AFTER")"
+
+  if [[ "$HASH_BEFORE" != "$HASH_AFTER" ]]; then
+    echo -e "${C_TEXT}-${NC} ${C_REPO}$REPO${NC}${C_TEXT}: pulled${NC} ${C_NUMBER}$N_COMMITS{$NC} ${C_TEXT}new commits (branch${NC} ${C_TEXT_HIGHLIGHT}$ACTIVE_BRANCH${NC} ${C_TEXT}from${NC} ${C_TEXT_HIGHLIGHT}$ACTIVE_REMOTE${NC}${C_TEXT})${NC}"
+
+    export N_REPOS_UPDATED="$((N_REPOS_UPDATED + 1))"
+  else
+    echo -e "${C_TEXT}-${NC} ${C_REPO}${REPO:2}${NC}${C_TEXT}: no changes${NC}"
+  fi
+
+  cd ..
+}
+
+export -f update_repo
+
+parallel -j 20 update_repo ::: "${REPOS[@]}"
+
+cd "$INITIAL_PATH" || exit 1
+
+echo ""
+
+if [[ -z $N_REPOS_UPDATED ]]; then
+  echo -e "${C_TEXT}No repositories were updated${NC}"
+else
+  echo -e "${C_TEXT}Updated${NC} ${C_NUMBER}$N_REPOS_UPDATED${NC}${C_TEXT}, skipped${NC} ${C_NUMBER}$N_REPOS_SKIPPED${NC} ${C_TEXT}git repos.${NC}"
+fi
