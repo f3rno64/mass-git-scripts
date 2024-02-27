@@ -71,7 +71,7 @@ update_repo() {
   N_COMMITS="$(git rev-list --count "$HASH_BEFORE".."$HASH_AFTER")"
 
   if [[ "$HASH_BEFORE" != "$HASH_AFTER" ]]; then
-    echo -e "${C_TEXT}-${NC} ${C_REPO}$REPO${NC}${C_TEXT}: pulled${NC} ${C_NUMBER}$N_COMMITS{$NC} ${C_TEXT}new commits (branch${NC} ${C_TEXT_HIGHLIGHT}$ACTIVE_BRANCH${NC} ${C_TEXT}from${NC} ${C_TEXT_HIGHLIGHT}$ACTIVE_REMOTE${NC}${C_TEXT})${NC}"
+    echo -e "${C_TEXT}-${NC} ${C_REPO}$REPO${NC}${C_TEXT}: pulled${NC} ${C_NUMBER}$N_COMMITS${NC} ${C_TEXT}new commits (branch${NC} ${C_TEXT_HIGHLIGHT}$ACTIVE_BRANCH${NC} ${C_TEXT}from${NC} ${C_TEXT_HIGHLIGHT}$ACTIVE_REMOTE${NC}${C_TEXT})${NC}"
 
     export N_REPOS_UPDATED="$((N_REPOS_UPDATED + 1))"
   else
