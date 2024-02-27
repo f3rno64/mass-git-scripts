@@ -103,8 +103,6 @@ pre-commit hook.
 
 Make sure to install dependencies for development with `pnpm i`.
 
-```bash
-
 ## Conclusion
 
 **mass-git-scripts** is a set of useful tools for anyone working with many git
@@ -112,10 +110,6 @@ repositories organized in separate folders by their owner (user or
 organization).
 
 Give it a try and see how it can improve your workflow.
-
-## Release History
-
-See [**`CHANGELOG.md`**](./CHANGELOG.md) for more information.
 
 ## License
 
