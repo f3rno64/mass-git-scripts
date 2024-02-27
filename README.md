@@ -2,6 +2,10 @@
 
 > mass-git-scripts
 
+<div style="width: 80%; margin: 0 auto;">
+  <img src="./res/git_clone_all_example.png" height="400" alt="git-clone-all Example"></img>
+</div>
+
 This repo contains a few scripts for managing large numbers of git
 repositories, either all those belonging to a user or organization on GitHub, or
 simply all repositories in a direct:ory.
