@@ -1,0 +1,6 @@
+{
+  "git-pull-all": ["shellcheck"],
+  "git-clone-all": ["shellcheck"],
+  "./lib/*.sh": ["shellcheck"],
+  "README.md": ["markdownlint"]
+}

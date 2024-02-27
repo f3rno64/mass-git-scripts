@@ -214,7 +214,7 @@ if [[ "$DEPTH" -lt 0 ]]; then
 fi
 
 if [[ -z "$OWNER" ]]; then
-	echo -e ${C_ERROR}"Error: --owner not specified${NC}"
+	echo -e "${C_ERROR}Error: --owner not specified${NC}"
 
   FOUND_ERRORS=1
 fi
@@ -330,7 +330,7 @@ clone_repo() {
 
 export -f clone_repos
 
-parallel -j $JOBS clone_repo ::: "${REPOS[@]}"
+parallel -j "$JOBS" clone_repo ::: "${REPOS[@]}"
 
 # Cleanup variables
 unset ARG_OWNER

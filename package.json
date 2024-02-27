@@ -1,0 +1,49 @@
+{
+  "name": "mass-git-scripts",
+  "version": "1.0.0",
+  "description": "A small collection of scripts for managing many git repositories.",
+  "author": "Cris Mihalache <f3rno64@gmail.com>",
+  "homepage": "https://github.com/f3rno64/mass-git-scripts",
+  "bugs": {
+    "url": "https://github.com/f3rno64/mass-git-scripts/issues"
+  },
+  "repository": "https://github.com/f3rno64/mass-git-scripts",
+  "license": "MIT",
+  "keywords": [
+    "git",
+    "bash",
+    "lint",
+    "shell",
+    "scripts",
+    "linting",
+    "markdown",
+    "shellcheck",
+    "markdownlint"
+  ],
+  "scripts": {
+    "lint": "pnpm lint:sh && pnpm lint:markdownlint",
+    "lint:fix": "pnpm lint:markdownlint:fix",
+    "lint:sh": "shellcheck git-clone-all git-pull-all ./lib/*.sh",
+    "lint:markdownlint": "markdownlint README.md",
+    "lint:markdownlint:fix": "markdownlint --fix README.md",
+    "prepare": "husky",
+    "prepare-release": "pnpm lint",
+    "update-deps": "updates -u -g",
+    "update-version": "standard-version"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^18.6.1",
+    "@commitlint/config-conventional": "^18.6.2",
+    "@commitlint/format": "^18.6.1",
+    "@commitlint/types": "^18.6.1",
+    "husky": "^9.0.11",
+    "lint": "^0.8.19",
+    "lint-staged": "^15.2.2",
+    "markdownlint-cli": "^0.39.0",
+    "remark": "^15.0.1",
+    "remark-lint": "^9.1.2",
+    "shellcheck": "^2.2.0",
+    "standard-version": "^9.5.0",
+    "updates": "^15.1.2"
+  }
+}
