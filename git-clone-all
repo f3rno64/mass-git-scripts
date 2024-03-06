@@ -199,9 +199,16 @@ FOUND_ERRORS=0
 
 GH_PATH="$(which gh)"
 JQ_PATH="$(which jq)"
+PARALLEL_PATH="$(which parallel)"
 
 if [[ -z "$GH_PATH" ]]; then
 	echo -e "${C_ERROR}Error: The GitHub CLI (gh) is required but was not found.${NC}"
+
+  FOUND_ERRORS=1
+fi
+
+if [[ -z "$PARALLEL_PATH" ]]; then
+	echo -e "${C_ERROR}Error: The parallel utility is required but was not found.${NC}"
 
   FOUND_ERRORS=1
 fi
